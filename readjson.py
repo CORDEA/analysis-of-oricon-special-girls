@@ -22,21 +22,25 @@ import json, sys, os, time
 def main():
     bef = []
     beftime = 0.0
+    home = os.path.expanduser("~")
     while True:
-        filepath = '/home/compbio/.mozilla/firefox/2rx2yf69.default/sessionstore-backups/recovery.js'
-        mtime = os.stat(filepath).st_mtime
-        if mtime != beftime:
-            f = open(filepath)
-            data = json.load(f)
-            readdata = data['windows'][0]['cookies'][0]['value']
-            items = readdata.split('%7C')
+        filepath = os.path.join(home, '.mozilla/firefox/2rx2yf69.default/sessionstore-backups/recovery.js')
+        if os.path.exists(filepath):
+            mtime = os.stat(filepath).st_mtime
+            if mtime != beftime:
+                f = open(filepath)
+                data = json.load(f)
+                readdata = data['windows'][0]['cookies'][0]['value']
+                items = readdata.split('%7C')
 
-            if bef != items:
-                writeFile(items[3:5])
-                writeFile(items[10:12])
-                bef = items
-                print "write to file."
-        beftime = mtime
+                if bef != items:
+                    writeFile(items[3:5])
+                    writeFile(items[10:12])
+                    bef = items
+                    print "write to file."
+            beftime = mtime
+        else:
+            sys.stderr.write("file not found.\n")
         time.sleep(1.0)
 
 def writeFile(items):
